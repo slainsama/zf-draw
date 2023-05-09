@@ -5,7 +5,11 @@ from globals.config import manager_token
 from utils.schedule_utils import scheduled_task
 from utils.user_utils import *
 
+from log.log_init import log_init
+
 app = Flask(__name__)
+
+log_init()
 
 URL_TOKEN = manager_token
 
