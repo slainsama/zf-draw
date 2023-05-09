@@ -1,3 +1,4 @@
+import logging
 import time
 import requests
 from models.user_picked import *
@@ -65,8 +66,7 @@ def get_list(offset=False):
     if min_last_re == 0:
         min_last_re = post_list[-1]['id']
     min_post_id = post_list[-1]['id']
-    print(min_post_id)
-    print(min_last_re)
+    logging.info(f"min_post_id:{min_post_id},min_last_re:{min_last_re}")
     if min_post_id > min_last_re:
         time.sleep(random.randint(3, 10))
         offset_post_list = get_list(offset)

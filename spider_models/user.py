@@ -1,4 +1,5 @@
 import json
+import logging
 import pickle
 import re
 import time
@@ -42,8 +43,12 @@ class User(object):
         User.user_list.append(self)
 
     def pickle_self(self):
-        serialized_class = pickle.dumps(self)
-        UserPicked.update(data=serialized_class).where(UserPicked.id == self.id).execute()
+        try:
+            logging.info(f"pickle {self.id}-{self.nickname} success!")
+            serialized_class = pickle.dumps(self)
+            UserPicked.update(data=serialized_class).where(UserPicked.id == self.id).execute()
+        except Exception as e:
+            logging.error(e)
 
     def login_with_passwd(self, mobile, password):
         password_url = 'https://www.zfrontier.com/api/login/mobile'
@@ -56,6 +61,7 @@ class User(object):
         }
         login_res = session.post(url=password_url, headers=self.headers, data=data)
         if '"ok":0' in login_res.text:
+            logging.info(f"login {self.id}-{self.nickname} success!")
             cookie_dict = requests.utils.dict_from_cookiejar(login_res.cookies)
             new_cookies = requests.cookies.RequestsCookieJar()
             new_cookies.update(cookie_dict)
@@ -67,17 +73,14 @@ class User(object):
             self.session = session
             self.mobile = mobile
             self.password = password
-            print(UserPicked.select().where(UserPicked.id == self.id).exists())
-            print(self.id)
             if UserPicked.select().where(UserPicked.id == self.id).exists():
-                print('in')
                 UserPicked.update(nickname=self.nickname, mobile=self.mobile, password=self.password,
                                   status=True).where(UserPicked.id == self.id).execute()
             else:
                 UserPicked.create(id=self.id, nickname=self.nickname, mobile=self.mobile, password=self.password,
                                   status=True)
         else:
-            print("err pass")
+            logging.info(f"login {self.id}-{self.nickname} false!")
 
     def login(self):
         start_url = 'https://www.zfrontier.com/login/ajaxAppProxyStart'
@@ -85,7 +88,6 @@ class User(object):
         self.session = session
         self.get_csrf_token()
         res = session.post(url=start_url, headers=self.headers)
-        print(res.text)
         if 'success' in res.text:
             start_json = json.loads(res.text)
             qr_url = start_json['data']['qrURL']
@@ -98,6 +100,7 @@ class User(object):
             while True:
                 login_res = session.post(url=check_url, headers=self.headers)
                 if '"ok":0' in login_res.text:
+                    logging.info(f"login {self.id}-{self.nickname} success!")
                     cookie_dict = requests.utils.dict_from_cookiejar(login_res.cookies)
                     new_cookies = requests.cookies.RequestsCookieJar()
                     new_cookies.update(cookie_dict)
@@ -109,17 +112,22 @@ class User(object):
             self.nickname = res_json['data']['user_info']['nickname']
             self.cookie = new_cookies
             self.session = session
-            print(UserPicked.select().where(UserPicked.id == self.id).exists())
             if UserPicked.select().where(UserPicked.id == self.id).exists():
                 UserPicked.update(nickname=self.nickname, status=True).where(UserPicked.id == self.id).execute()
             else:
                 UserPicked.create(id=self.id, nickname=self.nickname, status=True)
+        else:
+            logging.info(f"login {self.id}-{self.nickname} false!")
 
     def get_csrf_token(self):
-        csrf_url = 'https://www.zfrontier.com/app/'
-        res = self.session.get(url=csrf_url, headers=self.headers)
-        match = re.search(r"dow\.csrf_token = '(.+?)';", res.text)
-        self.headers['X-Csrf-Token'] = match.group(1)
+        try:
+            csrf_url = 'https://www.zfrontier.com/app/'
+            res = self.session.get(url=csrf_url, headers=self.headers)
+            match = re.search(r"dow\.csrf_token = '(.+?)';", res.text)
+            self.headers['X-Csrf-Token'] = match.group(1)
+            logging.info(f"{self.id}-{self.nickname} got csrf-token")
+        except Exception as e:
+            logging.error(e)
 
     def reply(self, post_id):
         url = 'https://www.zfrontier.com/v2/flow/reply'
@@ -130,22 +138,20 @@ class User(object):
         }
         try:
             res = self.session.post(url=url, data=data, headers=self.headers, cookies=self.cookie)
-            print(res.text)
             if '"ok":0' in res.text:
                 self.last_replied = post_id
+                logging.info(f"{self.id}-{self.nickname} replied {post_id}")
                 UserPicked.update(last_replied=post_id).where(UserPicked.id == self.id).execute()
             else:
                 try:
+                    logging.warning(f"try to re-login {self.id}-{self.nickname}")
                     this_user = UserPicked.select().where(UserPicked.id == self.id).execute()
                     mobile = this_user.mobile
                     password = this_user.password
                     self.login_with_passwd(mobile, password)
+                    logging.info(f"re-login {self.id}-{self.nickname} success!")
                 except Exception as e:
-                    print(e)
+                    logging.warning(e)
                     UserPicked.update(status=False).where(UserPicked.id == self.id).execute()
         except Exception as e:
-            print(e)
-
-    def format_last_replied(self):
-        self.last_replied = 141258
-        UserPicked.update(last_replied=141258).where(UserPicked.id == self.id).execute()
+            logging.error(e)

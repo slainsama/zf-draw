@@ -4,6 +4,7 @@ from spider_models.user import *
 def load_from_database():
     for the_user in UserPicked.select():
         loaded_user = pickle.loads(the_user.data)
+        logging.info(f"loaded user {loaded_user.id}-{loaded_user.nickname}")
         User.user_list.append(loaded_user)
 
 
