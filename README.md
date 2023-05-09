@@ -2,6 +2,16 @@
 
 Automated spider for zfrontier lottery with a web manager.
 
+
+
+## Statement
+
+This program is just for learn, don't use it to do anything illegal.
+
+If this program violates your rights, please contact me to delete.
+
+
+
 ## Quick Start
 
 *Read this for a quick use.*
@@ -46,6 +56,8 @@ gunicorn -w 3 -b 127.0.0.1:8080 main:app
 > In consideration of all aspects, it is recommended that you do not use the server that comes with flask to start.
 
 ## Documents
+
+If you don't want to re-develop this program, you can ignore the following part.
 
 ```
 .
@@ -164,5 +176,69 @@ Use to save obj in some unexcepted situations mostly.
 except Exception as e:
 	print(e)
 	cleanup_all()
+```
+
+### get posts with lottery
+
+According to observation, most the drawing posts in `/app/circle/1#2007`, so we just get posts from that.
+
+#### get_list()
+
+In `utils.post_utils`
+
+```python
+get_list(offset=False)
+```
+
+The `offset` is a signal for the list of flow type from the website.
+
+It's the last one post's id in your previous request.
+
+We suppose you've just got a json(simplified) like this.
+
+```json
+{
+  "ok":0,
+  "msg":"",
+  "data":{
+    "list":[
+      {"id":114514,...},
+       {"id":114513,...},
+    {"id":114512,...}]
+  } 
+}
+```
+
+If you wanna get the post that id=114511, you need to request like this.
+
+```python
+get_list(offset=114512)
+```
+
+Actually, `get_list` is a recursive function, it will request posts until the post_id less than the min last_replied. So it suppose to return a list that include post_id that your users hasn't requested.
+
+### Participate in the lottery
+
+#### User.reply()
+
+The way that you participate in a lottery is by replying to it.
+
+So, use `User.reply()` to participate in.
+
+```python
+test=User()
+test.reply(114514)
+```
+
+### scheduled task
+
+#### scheduled_task()
+
+In `utils.schedule_utils`
+
+This func is for the scheduled task, it will call the `get_list()`, then choose right users to reply it.
+
+```python
+scheduled_task(User.user_list
 ```
 
