@@ -1,13 +1,9 @@
 from flask import Flask, render_template
-from flask import jsonify
 from flask_apscheduler import APScheduler
 
-import utils.user_utils
-from models.user_picked import *
-from utils.schedule_utils import scheduled_task
-from spider_models.user import *
-from utils.user_utils import *
 from globals.config import manager_token
+from utils.schedule_utils import scheduled_task
+from utils.user_utils import *
 
 app = Flask(__name__)
 

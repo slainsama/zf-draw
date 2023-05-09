@@ -1,19 +1,13 @@
+import json
+import pickle
 import re
-
+import time
 from urllib import parse
 
-import requests
-from requests import utils
-from requests import cookies
-import json
-
 import qrcode
-
-from PIL import Image
-
-import time
-
-import pickle
+import requests
+from requests import cookies
+from requests import utils
 
 from models.user_picked import UserPicked
 
@@ -146,7 +140,8 @@ class User(object):
                     mobile = this_user.mobile
                     password = this_user.password
                     self.login_with_passwd(mobile, password)
-                except:
+                except Exception as e:
+                    print(e)
                     UserPicked.update(status=False).where(UserPicked.id == self.id).execute()
         except Exception as e:
             print(e)

@@ -9,4 +9,4 @@ db_name = config.get('database', 'name')
 db_user = config.get('database', 'user')
 db_pass = config.get('database', 'password')
 
-manager_token=config.get('token','manager_token')
+manager_token = config.get('token', 'manager_token')
