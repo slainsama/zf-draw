@@ -13,6 +13,11 @@ log_init()
 
 URL_TOKEN = manager_token
 
+information = '''use '/<manager_token>/status' to see users' status.
+use '/<manager_token>/logs' to see logs.
+use '/<manager_token>/adduser/<user_mobile>/<user_passowrd>' to add a user.
+'''
+
 
 def add_token(url):
     return '/' + URL_TOKEN + url
@@ -20,20 +25,28 @@ def add_token(url):
 
 @app.route('/')
 def index_handler():
-    return render_template("index.html")
+    return render_template("index.html", information=information)
 
 
 @app.route(add_token('/status'))
 def get_status_handler():
     users = UserPicked.select()
-    return render_template("status.html", rows=users)
+    return render_template("status.html", rows=users,information=information)
+
+
+@app.route(add_token('/logs'))
+def get_logs_handler():
+    with open('logs.log', 'r') as file:
+        lines = [line.strip() for line in file.readlines()[:500]]
+        file.close()
+    return render_template("logs.html", information=information, logs=lines)
 
 
 @app.route(add_token('/adduser/<int:mobile>/<string:password>'))
 def add_user_handler(mobile, password):
     message = add_user(mobile, password)
     users = UserPicked.select()
-    return render_template("status.html", rows=users, message=message)
+    return render_template("status.html", rows=users, message=message,information=information)
 
 
 if __name__ == '__main__':
