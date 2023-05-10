@@ -1,2 +1,28 @@
 .idea
 config.ini
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Virtualenv
+venv/
+ENV/
+
+# Compiled files
+*.pyc
+*.pyo
+
+# Logs and databases
+*.log
+*.db
+*.sqlite3
+
+# Cache and temp files
+__pycache__/
+*.py[cod]
+*.bak
+*~
+*.swp
+.DS_Store
