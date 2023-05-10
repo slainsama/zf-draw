@@ -41,7 +41,7 @@ def get_logs_handler():
     with open('logs.log', 'r') as file:
         lines = [line.strip() for line in file.readlines()[:500]]
         file.close()
-    return render_template("logs.html", information=information, logs=lines)
+    return render_template("logs.html", information=information, logs=lines.reverse())
 
 
 @app.route(add_token('/adduser/<int:mobile>/<string:password>'))
