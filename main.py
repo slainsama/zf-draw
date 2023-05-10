@@ -16,7 +16,7 @@ URL_TOKEN = manager_token
 
 information = '''use '/<manager_token>/status' to see users' status.
 use '/<manager_token>/logs' to see logs.
-use '/<manager_token>/<user_id>/msgs' to see the user's msg.
+use '/<manager_token>/msgs/<user_id>' to see the user's msg.
 use '/<manager_token>/adduser/<user_mobile>/<user_passowrd>' to add a user.
 '''
 
@@ -51,7 +51,7 @@ def add_user_handler(mobile, password):
     return render_template("status.html", rows=users, message=message, information=information)
 
 
-@app.route(add_token('/<int:user_id>/msgs'))
+@app.route(add_token('/msgs/<int:user_id>'))
 def get_msg_handler(user_id):
     for user in User.user_list:
         if int(user.id) == user_id:
@@ -60,6 +60,14 @@ def get_msg_handler(user_id):
     return render_template("msgs.html", information=information, nickname=user_id,
                            msgs=["Invalid user id, please check user "
                                  "list!"])
+
+
+@app.route(add_token('/msgs'))
+def get_all_msg_handler():
+    msg_list = list()
+    for user in User.user_list:
+        msg_list.extend(user.get_msg())
+    return render_template("msgs.html", information=information, nickname="all user", msgs=msg_list)
 
 
 if __name__ == '__main__':

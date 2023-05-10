@@ -169,10 +169,10 @@ class User(object):
             msg_list = res_dict["data"]["list"]
             msgs = list()
             for i in msg_list:
-                msgs.append(i["html"])
+                msgs.append([i["id"],self.nickname,i["html"]])
             if has_more:
                 startId = msg_list[-1]["id"]
-                msgs.append(self.get_msg(startId))
+                msgs.extend(self.get_msg(startId))
             logging.info(f"get msg {self.id}-{self.nickname} success!")
         except Exception as e:
             logging.error(e)
