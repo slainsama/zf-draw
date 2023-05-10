@@ -7,6 +7,7 @@ from models.user_picked import UserPicked
 def load_from_database():
     for the_user in UserPicked.select():
         loaded_user = pickle.loads(the_user.data)
+        loaded_user.get_csrf_token()
         logging.info(f"loaded user {loaded_user.id}-{loaded_user.nickname}")
         User.user_list.append(loaded_user)
 
@@ -24,4 +25,5 @@ def add_user(mobile, password):
         del new_user
         return "Success added!"
     except Exception as e:
+        logging.error(e)
         return e

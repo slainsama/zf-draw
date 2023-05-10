@@ -10,3 +10,7 @@ db_user = config.get('database', 'user')
 db_pass = config.get('database', 'password')
 
 manager_token = config.get('token', 'manager_token')
+
+host=config.get('server','host')
+port=config.get('server','port')
+debug=config.getboolean('server','debug')

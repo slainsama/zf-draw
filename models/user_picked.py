@@ -10,6 +10,7 @@ class UserPicked(Model):
     last_replied = IntegerField()
     data = BlobField()
     status = BooleanField()
+    got_prize=BooleanField()
 
     class Meta:
         database = globals.DB

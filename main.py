@@ -1,14 +1,12 @@
 from flask import Flask, render_template
 from flask_apscheduler import APScheduler
 
-from globals.config import manager_token
+from globals.config import *
+from log.log_init import log_init
 from models.user_picked import UserPicked
+from spider_models.user import User
 from utils.schedule_utils import scheduled_task
 from utils.user_utils import load_from_database, add_user, cleanup_all
-from spider_models.user import User
-
-from log.log_init import log_init
-
 
 app = Flask(__name__)
 
@@ -18,6 +16,7 @@ URL_TOKEN = manager_token
 
 information = '''use '/<manager_token>/status' to see users' status.
 use '/<manager_token>/logs' to see logs.
+use '/<manager_token>/<user_id>/msgs' to see the user's msg.
 use '/<manager_token>/adduser/<user_mobile>/<user_passowrd>' to add a user.
 '''
 
@@ -52,10 +51,20 @@ def add_user_handler(mobile, password):
     return render_template("status.html", rows=users, message=message, information=information)
 
 
+@app.route(add_token('/<int:user_id>/msgs'))
+def get_msg_handler(user_id):
+    for user in User.user_list:
+        if int(user.id) == user_id:
+            msg_list = user.get_msg()
+            return render_template("msgs.html", information=information, nickname=user.nickname, msgs=msg_list)
+    return render_template("msgs.html", information=information, nickname=user_id,
+                           msgs=["Invalid user id, please check user "
+                                 "list!"])
+
+
 if __name__ == '__main__':
     try:
         load_from_database()
-        print(User.user_list)
         scheduler = APScheduler()
         app.config['SCHEDULER_API_ENABLED'] = True
         app.config['JOBS'] = [
@@ -69,7 +78,7 @@ if __name__ == '__main__':
         ]
         scheduler.init_app(app)
         scheduler.start()
-        app.run()
+        app.run(host=host, port=port, debug=debug)
     except Exception as e:
         print(e)
         cleanup_all()

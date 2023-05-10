@@ -155,3 +155,26 @@ class User(object):
                     UserPicked.update(status=False).where(UserPicked.id == self.id).execute()
         except Exception as e:
             logging.error(e)
+
+    def get_msg(self, startId=0):
+        msg_url = 'https://www.zfrontier.com/v2/notifies'
+        data = {
+            'startId': startId
+        }
+        try:
+            res = self.session.post(url=msg_url, data=data,headers=self.headers,cookies=self.cookie)
+            res_dict = json.loads(res.text)
+            logging.info(f"get msgs of {self.nickname}:{res_dict}")
+            has_more = res_dict["data"]["hasMore"]
+            msg_list = res_dict["data"]["list"]
+            msgs = list()
+            for i in msg_list:
+                msgs.append(i["html"])
+            if has_more:
+                startId = msg_list[-1]["id"]
+                msgs.append(self.get_msg(startId))
+            logging.info(f"get msg {self.id}-{self.nickname} success!")
+        except Exception as e:
+            logging.error(e)
+            msgs=[]
+        return msgs
