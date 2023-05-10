@@ -45,11 +45,10 @@ def get_list(offset=False):
     if offset:
         data['offset'] = offset
     res = requests.post(url=list_url, data=data, headers=headers, cookies=cookies)
-    print(res.text)
+    logging.info(f"get list success")
     list_json = json.loads(res.text)
     offset = list_json['data']['offset']
     post_list = list_json['data']['list']
-    print(list_json)
     handled_post_list = list()
     detail_url = 'https://www.zfrontier.com/v2/flow/detail'
     for i in post_list:
@@ -71,4 +70,5 @@ def get_list(offset=False):
         time.sleep(random.randint(3, 10))
         offset_post_list = get_list(offset)
         handled_post_list.extend(offset_post_list)
+    logging.info(f"post_list:{handled_post_list}")
     return handled_post_list
