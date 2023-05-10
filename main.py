@@ -1,3 +1,6 @@
+import collections
+import fileinput
+
 from flask import Flask, render_template
 from flask_apscheduler import APScheduler
 
@@ -38,22 +41,11 @@ def get_status_handler():
 
 @app.route(add_token('/logs'))
 def get_logs_handler():
-    line_list = []
-    with open('logs.log', 'r') as f:
-        f.seek(0, 2)
-        pos = f.tell()
-        line_count = 0
-        while pos >= 0 and line_count < 500:
-            f.seek(pos)
-            next_char = f.read(1)
-            if next_char == '\n':
-                line_count += 1
-            pos -= 1
-        lines = f.readlines()
-        line_list = [line.strip() for line in lines[-500:]]
-        f.close()
-    line_list.reverse()
-    return render_template("logs.html", information=information, logs=line_list)
+    lines = collections.deque(maxlen=500)
+    for line in fileinput.input('logs.log'):
+        lines.append(line.strip())
+    lines.reverse()
+    return render_template("logs.html", information=information, logs=lines)
 
 
 @app.route(add_token('/adduser/<int:mobile>/<string:password>'))
