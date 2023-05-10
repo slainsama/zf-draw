@@ -79,8 +79,10 @@ class User(object):
             else:
                 UserPicked.create(id=self.id, nickname=self.nickname, mobile=self.mobile, password=self.password,
                                   status=True)
+            return True
         else:
             logging.info(f"login {self.id}-{self.nickname} false!")
+            return False
 
     def login(self):
         start_url = 'https://www.zfrontier.com/login/ajaxAppProxyStart'

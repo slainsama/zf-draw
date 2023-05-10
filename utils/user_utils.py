@@ -20,10 +20,9 @@ def cleanup_all():
 def add_user(mobile, password):
     try:
         new_user = User()
-        new_user.login_with_passwd(mobile, password)
+        status = new_user.login_with_passwd(mobile, password)
         new_user.pickle_self()
-        del new_user
-        return "Success added!"
+        return f"User login {str(status)}"
     except Exception as e:
         logging.error(e)
         return e
