@@ -2,10 +2,13 @@ from flask import Flask, render_template
 from flask_apscheduler import APScheduler
 
 from globals.config import manager_token
+from models.user_picked import UserPicked
 from utils.schedule_utils import scheduled_task
-from utils.user_utils import *
+from utils.user_utils import load_from_database, add_user, cleanup_all
+from spider_models.user import User
 
 from log.log_init import log_init
+
 
 app = Flask(__name__)
 
@@ -31,7 +34,7 @@ def index_handler():
 @app.route(add_token('/status'))
 def get_status_handler():
     users = UserPicked.select()
-    return render_template("status.html", rows=users,information=information)
+    return render_template("status.html", rows=users, information=information)
 
 
 @app.route(add_token('/logs'))
@@ -46,7 +49,7 @@ def get_logs_handler():
 def add_user_handler(mobile, password):
     message = add_user(mobile, password)
     users = UserPicked.select()
-    return render_template("status.html", rows=users, message=message,information=information)
+    return render_template("status.html", rows=users, message=message, information=information)
 
 
 if __name__ == '__main__':

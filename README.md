@@ -43,17 +43,9 @@ Please **make sure to modify** the `manager_token` !
 
 Start with flask's developing server
 ```shell
-flask run
+python3 main.py
 ```
-Start with gunicorn
-```shell
-gunicorn -w 3 -b 127.0.0.1:8080 main:app
-# -w for num of worker
-# -b for port binding
-# main for your file name
-# app for your instance name
-```
-> In consideration of all aspects, it is recommended that you do not use the server that comes with flask to start.
+> Although the official does not recommend using the server that comes with flask, due to the simple nature of our code, we directly use flask to start
 
 ## Documents
 

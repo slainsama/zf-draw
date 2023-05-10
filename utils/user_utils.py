@@ -1,4 +1,7 @@
-from spider_models.user import *
+from spider_models.user import User
+import logging
+import pickle
+from models.user_picked import UserPicked
 
 
 def load_from_database():
