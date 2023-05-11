@@ -21,7 +21,10 @@ def add_user(mobile, password):
     try:
         new_user = User()
         status = new_user.login_with_passwd(mobile, password)
-        new_user.pickle_self()
+        if not status:
+            del new_user
+        else:
+            new_user.pickle_self()
         return f"User login {str(status)}"
     except Exception as e:
         logging.error(e)

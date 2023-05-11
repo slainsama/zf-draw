@@ -42,6 +42,9 @@ class User(object):
         self.session = None
         User.user_list.append(self)
 
+    def __del__(self):
+        User.user_list.remove(self)
+
     def pickle_self(self):
         try:
             logging.info(f"pickle {self.id}-{self.nickname} success!")
@@ -164,19 +167,19 @@ class User(object):
             'startId': startId
         }
         try:
-            res = self.session.post(url=msg_url, data=data,headers=self.headers,cookies=self.cookie)
+            res = self.session.post(url=msg_url, data=data, headers=self.headers, cookies=self.cookie)
             res_dict = json.loads(res.text)
             logging.info(f"get msgs of {self.nickname}:{res_dict}")
             has_more = res_dict["data"]["hasMore"]
             msg_list = res_dict["data"]["list"]
             msgs = list()
             for i in msg_list:
-                msgs.append([i["id"],self.nickname,i["html"]])
+                msgs.append([i["id"], self.nickname, i["html"]])
             if has_more:
                 startId = msg_list[-1]["id"]
                 msgs.extend(self.get_msg(startId))
             logging.info(f"get msg {self.id}-{self.nickname} success!")
         except Exception as e:
             logging.error(e)
-            msgs=[]
+            msgs = []
         return msgs
