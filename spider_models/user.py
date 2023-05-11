@@ -42,9 +42,6 @@ class User(object):
         self.session = None
         User.user_list.append(self)
 
-    def __del__(self):
-        User.user_list.remove(self)
-
     def pickle_self(self):
         try:
             logging.info(f"pickle {self.id}-{self.nickname} success!")

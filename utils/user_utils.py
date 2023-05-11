@@ -22,6 +22,7 @@ def add_user(mobile, password):
         new_user = User()
         status = new_user.login_with_passwd(mobile, password)
         if not status:
+            User.user_list.remove(new_user)
             del new_user
         else:
             new_user.pickle_self()
