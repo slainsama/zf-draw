@@ -231,6 +231,6 @@ In `utils.schedule_utils`
 This func is for the scheduled task, it will call the `get_list()`, then choose right users to reply it.
 
 ```python
-scheduled_task(User.user_list
+scheduled_task(User.user_list)
 ```
 

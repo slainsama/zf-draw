@@ -13,5 +13,5 @@ def scheduled_task(users):
                 time.sleep(random.randint(10, 30))
         msg_list = user.get_msg()
         for i in msg_list:
-            if "中奖" in i or "抽签" in i:
+            if "抽签助手" in i:
                 UserPicked.update(got_prize=True).where(id == user.id)

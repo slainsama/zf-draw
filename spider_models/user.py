@@ -155,6 +155,8 @@ class User(object):
                 except Exception as e:
                     logging.warning(e)
                     UserPicked.update(status=False).where(UserPicked.id == self.id).execute()
+                    User.user_list.remove(self)
+                    logging.info(f"del user {self.id}-{self.nickname} temporarily!")
         except Exception as e:
             logging.error(e)
 
