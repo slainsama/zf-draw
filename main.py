@@ -8,7 +8,7 @@ from globals.config import *
 from log.log_init import log_init
 from models.user_picked import UserPicked
 from spider_models.user import User
-from utils.schedule_utils import scheduled_task
+from utils.schedule_utils import *
 from utils.user_utils import load_from_database, add_user, cleanup_all
 
 app = Flask(__name__)
@@ -82,10 +82,17 @@ if __name__ == '__main__':
         app.config['JOBS'] = [
             {
                 'id': 'spider',
-                'func': scheduled_task,
+                'func': autoreply_task,
                 'args': [User.user_list],
                 'trigger': 'interval',
-                'seconds': 1800  # 每半小时触发一次任务
+                'seconds': autoreply_interval  # 每半小时触发一次任务
+            },
+            {
+                'id': 'auto-signin',
+                'func': signin_task,
+                'args': [User.user_list],
+                'trigger': 'interval',
+                'seconds': signin_interval  # 每天触发一次任务
             }
         ]
         scheduler.init_app(app)

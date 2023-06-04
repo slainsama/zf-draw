@@ -14,3 +14,6 @@ manager_token = config.get('token', 'manager_token')
 host=config.get('server','host')
 port=config.get('server','port')
 debug=config.getboolean('server','debug')
+
+signin_interval=config.getint('task','signin_interval')
+autoreply_interval = config.getint('task', 'autoreply_interval')

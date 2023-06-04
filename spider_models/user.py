@@ -182,3 +182,17 @@ class User(object):
             logging.error(e)
             msgs = []
         return msgs
+    
+    def sign_in(self) -> None:
+        signin_url = "https://www.zfrontier.com/v2/sign"
+
+        try:
+            res = self.session.post(url=signin_url, headers=self.headers, cookies=self.cookie)
+            
+            res_dict = json.loads(res.text)
+            signin_msg = res_dict["data"]["msg"]
+            signin_lv = res_dict["data"]["bbs_lv"]
+
+            logging.info(f"sign in {self.id}-{self.nickname} success! Message: {signin_msg} Lv: {signin_lv}")
+        except Exception as e:
+            logging.error(f"sign in {self.id}-{self.nickname} failed! {res.text}")
