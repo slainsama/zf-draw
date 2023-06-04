@@ -3,3 +3,5 @@ Flask_APScheduler==1.12.4
 peewee==3.16.2
 qrcode==7.4.2
 Requests==2.30.0
+cryptography==41.0.1
+PyMySQL==1.0.3
