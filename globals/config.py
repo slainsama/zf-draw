@@ -1,7 +1,7 @@
 import configparser
 
 config = configparser.ConfigParser()
-config.read('../config.ini')
+config.read('./config.ini')
 
 db_host = config.get('database', 'host')
 db_port = config.getint('database', 'port')
