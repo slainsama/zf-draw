@@ -8,9 +8,14 @@ from models.user_picked import UserPicked
 
 def load_from_database():
     for the_user in UserPicked.select():
-        loaded_user = pickle.loads(the_user.data)
+        if the_user.data:
+            loaded_user = pickle.loads(the_user.data)
+            logging.info(f"loaded user {loaded_user.id}-{loaded_user.nickname}")
+        else:
+            loaded_user=User()
+            loaded_user.login_with_passwd(the_user.mobile,the_user.password)
+            logging.info(f"re-login user {loaded_user.id}-{loaded_user.nickname}")
         loaded_user.get_csrf_token()
-        logging.info(f"loaded user {loaded_user.id}-{loaded_user.nickname}")
         User.user_list.append(loaded_user)
 
 

@@ -220,6 +220,7 @@ class User(object):
         logging.info(data)
         res = requests.post(url=list_url, data=data, headers=self.headers,cookies=self.cookie)
         print(res.text)
+        logging.info(res.text)
         logging.info(f"get list success")
         list_json = json.loads(res.text)
         offset = list_json['data']['offset']

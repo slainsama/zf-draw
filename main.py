@@ -98,6 +98,6 @@ if __name__ == '__main__':
         scheduler.init_app(app)
         scheduler.start()
         app.run(host=host, port=port, debug=debug)
-    except Exception as e:
-        print(e)
+    except KeyboardInterrupt:
         cleanup_all()
+        print("cleaned!")
