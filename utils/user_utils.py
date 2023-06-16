@@ -1,3 +1,5 @@
+import random
+
 from spider_models.user import User
 import logging
 import pickle
@@ -30,3 +32,8 @@ def add_user(mobile, password):
     except Exception as e:
         logging.error(e)
         return e
+
+
+def get_random_user():
+    random_count = random.randint(0, len(User.user_list) - 1)
+    return User.user_list[random_count]

@@ -1,8 +1,10 @@
 import json
 import logging
 import pickle
+import random
 import re
 import time
+import hashlib
 from urllib import parse
 
 import qrcode
@@ -29,6 +31,7 @@ class User(object):
             'Accept': 'application/json, text/plain, */*',
             'X-Client-Locale': 'zh-CN',
             'Sec-Ch-Ua-Platform': '"macOS"',
+            'Referer':'https://www.zfrontier.com',
             'Origin': 'https://www.zfrontier.com',
             'Sec-Fetch-Site': 'same-origin',
             'Sec-Fetch-Mode': 'cors',
@@ -124,10 +127,11 @@ class User(object):
     def get_csrf_token(self):
         try:
             csrf_url = 'https://www.zfrontier.com/app/'
-            res = self.session.get(url=csrf_url, headers=self.headers)
+            res = self.session.get(url=csrf_url, headers=self.headers,cookies=self.cookie)
             match = re.search(r"dow\.csrf_token = '(.+?)';", res.text)
             self.headers['X-Csrf-Token'] = match.group(1)
             logging.info(f"{self.id}-{self.nickname} got csrf-token")
+            print(self.nickname)
         except Exception as e:
             logging.error(e)
 
@@ -196,3 +200,49 @@ class User(object):
             logging.info(f"sign in {self.id}-{self.nickname} success! Message: {signin_msg} Lv: {signin_lv}")
         except Exception as e:
             logging.error(f"sign in {self.id}-{self.nickname} failed! {res.text}")
+
+    def get_list(self,offset=False) -> list:
+        list_url = 'https://www.zfrontier.com/v2/flow/list'
+        arg_time=str(int(time.time()))
+        md5=hashlib.md5((arg_time+self.headers['X-Csrf-Token']).encode("utf-8"))
+        arg_t=md5.hexdigest()
+        data = {
+            'time':arg_time,
+            't': arg_t,
+            'offset': '',
+            'cid': '1',
+            'sortBy': 'new',
+            'tagIds[0]': '2007'
+        }
+        print(data)
+        if offset:
+            data['offset'] = offset
+        res = requests.post(url=list_url, data=data, headers=self.headers,cookies=self.cookie)
+        print(res.text)
+        logging.info(f"get list success")
+        list_json = json.loads(res.text)
+        offset = list_json['data']['offset']
+        post_list = list_json['data']['list']
+        handled_post_list = list()
+        detail_url = 'https://www.zfrontier.com/v2/flow/detail'
+        for i in post_list:
+            post_hash_id = i['hash_id']
+            post_id = i['id']
+            data = {'id': post_hash_id}
+            res = requests.post(url=detail_url, headers=self.headers, cookies=self.cookie, data=data)
+            if '待抽奖' in res.text:
+                handled_post_list.append(post_id)
+        min_last_re = UserPicked.select().get().last_replied
+        for user in UserPicked.select():
+            if (user.last_replied < min_last_re) and (user.last_replied != 0):
+                min_last_re = user.last_replied
+        if min_last_re == 0:
+            min_last_re = post_list[-1]['id']
+        min_post_id = post_list[-1]['id']
+        logging.info(f"min_post_id:{min_post_id},min_last_re:{min_last_re}")
+        if min_post_id > min_last_re:
+            time.sleep(random.randint(3, 10))
+            offset_post_list = self.get_list(offset)
+            handled_post_list.extend(offset_post_list)
+        logging.info(f"post_list:{handled_post_list}")
+        return handled_post_list
