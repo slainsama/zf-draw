@@ -217,6 +217,7 @@ class User(object):
         print(data)
         if offset:
             data['offset'] = offset
+        logging.info(data)
         res = requests.post(url=list_url, data=data, headers=self.headers,cookies=self.cookie)
         print(res.text)
         logging.info(f"get list success")
