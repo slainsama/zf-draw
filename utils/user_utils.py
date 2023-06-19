@@ -45,4 +45,4 @@ def get_random_user():
 
 
 def del_user_bytes():
-    UserPicked.update(data=0).execute()
+    UserPicked.update(data=None).execute()
