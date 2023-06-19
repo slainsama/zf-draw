@@ -8,6 +8,8 @@ db_port = config.getint('database', 'port')
 db_name = config.get('database', 'name')
 db_user = config.get('database', 'user')
 db_pass = config.get('database', 'password')
+db_load=config.get('database','load_from_database')
+db_clear=config.get('database','clear_bytes')
 
 manager_token = config.get('token', 'manager_token')
 

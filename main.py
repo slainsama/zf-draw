@@ -9,7 +9,7 @@ from log.log_init import log_init
 from models.user_picked import UserPicked
 from spider_models.user import User
 from utils.schedule_utils import *
-from utils.user_utils import load_from_database, add_user, cleanup_all
+from utils.user_utils import load_from_database, add_user, cleanup_all,del_user_bytes
 
 app = Flask(__name__)
 
@@ -76,7 +76,10 @@ def get_all_msg_handler():
 
 if __name__ == '__main__':
     try:
-        load_from_database()
+        if db_clear:
+            del_user_bytes()
+        if db_load:
+            load_from_database()
         scheduler = APScheduler()
         app.config['SCHEDULER_API_ENABLED'] = True
         app.config['JOBS'] = [

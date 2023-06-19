@@ -12,8 +12,8 @@ def load_from_database():
             loaded_user = pickle.loads(the_user.data)
             logging.info(f"loaded user {loaded_user.id}-{loaded_user.nickname}")
         else:
-            loaded_user=User()
-            loaded_user.login_with_passwd(the_user.mobile,the_user.password)
+            loaded_user = User()
+            loaded_user.login_with_passwd(the_user.mobile, the_user.password)
             logging.info(f"re-login user {loaded_user.id}-{loaded_user.nickname}")
         loaded_user.get_csrf_token()
         User.user_list.append(loaded_user)
@@ -42,3 +42,7 @@ def add_user(mobile, password):
 def get_random_user():
     random_count = random.randint(0, len(User.user_list) - 1)
     return User.user_list[random_count]
+
+
+def del_user_bytes():
+    UserPicked.update(data=0).execute()
