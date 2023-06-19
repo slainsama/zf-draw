@@ -31,7 +31,7 @@ class User(object):
             'Accept': 'application/json, text/plain, */*',
             'X-Client-Locale': 'zh-CN',
             'Sec-Ch-Ua-Platform': '"macOS"',
-            'Referer':'https://www.zfrontier.com',
+            'Referer': 'https://www.zfrontier.com',
             'Origin': 'https://www.zfrontier.com',
             'Sec-Fetch-Site': 'same-origin',
             'Sec-Fetch-Mode': 'cors',
@@ -63,7 +63,7 @@ class User(object):
             'password': password
         }
         login_res = session.post(url=password_url, headers=self.headers, data=data)
-        if int(json.loads(login_res.text)['ok'])==0:
+        if int(json.loads(login_res.text)['ok']) == 0:
             logging.info(f"login {self.id}-{self.nickname} success!")
             cookie_dict = requests.utils.dict_from_cookiejar(login_res.cookies)
             new_cookies = requests.cookies.RequestsCookieJar()
@@ -129,7 +129,7 @@ class User(object):
     def get_csrf_token(self):
         try:
             csrf_url = 'https://www.zfrontier.com/app/'
-            res = self.session.get(url=csrf_url, headers=self.headers,cookies=self.cookie)
+            res = self.session.get(url=csrf_url, headers=self.headers, cookies=self.cookie)
             match = re.search(r"dow\.csrf_token = '(.+?)';", res.text)
             self.headers['X-Csrf-Token'] = match.group(1)
             logging.info(f"{self.id}-{self.nickname} got csrf-token")
@@ -187,13 +187,13 @@ class User(object):
             logging.error(e)
             msgs = []
         return msgs
-    
+
     def sign_in(self) -> None:
         signin_url = "https://www.zfrontier.com/v2/sign"
 
         try:
             res = self.session.post(url=signin_url, headers=self.headers, cookies=self.cookie)
-            
+
             res_dict = json.loads(res.text)
             signin_msg = res_dict["data"]["msg"]
             signin_lv = res_dict["data"]["bbs_lv"]
@@ -202,23 +202,26 @@ class User(object):
         except Exception as e:
             logging.error(f"sign in {self.id}-{self.nickname} failed! {res.text}")
 
-    def get_list(self,offset=False) -> list:
+    def get_list(self, time=None, t=None, offset=False) -> list:
         list_url = 'https://www.zfrontier.com/v2/flow/list'
-        arg_time=str(int(time.time()))
-        md5=hashlib.md5((arg_time+self.headers['X-Csrf-Token']).encode("utf-8"))
-        arg_t=md5.hexdigest()
+        arg_time = str(int(time.time()))
+        md5 = hashlib.md5((arg_time + self.headers['X-Csrf-Token']).encode("utf-8"))
+        arg_t = md5.hexdigest()
         data = {
-            'time':arg_time,
+            'time': arg_time,
             't': arg_t,
             'offset': '',
             'cid': '1',
             'sortBy': 'new',
             'tagIds[0]': '2007'
         }
+        if time is not None or t is not None:
+            data['time'] = time
+            data['t'] = t
         if offset:
             data['offset'] = offset
         logging.info(data)
-        res = requests.post(url=list_url, data=data, headers=self.headers,cookies=self.cookie)
+        res = requests.post(url=list_url, data=data, headers=self.headers, cookies=self.cookie)
         logging.info(res.text)
         logging.info(f"get list success")
         list_json = json.loads(res.text)
@@ -243,7 +246,7 @@ class User(object):
         logging.info(f"min_post_id:{min_post_id},min_last_re:{min_last_re}")
         if min_post_id > min_last_re:
             time.sleep(random.randint(3, 10))
-            offset_post_list = self.get_list(offset)
+            offset_post_list = self.get_list(time=data['time'],t=data['t'],offset=offset)
             handled_post_list.extend(offset_post_list)
         logging.info(f"post_list:{handled_post_list}")
         return handled_post_list
