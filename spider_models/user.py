@@ -202,22 +202,22 @@ class User(object):
         except Exception as e:
             logging.error(f"sign in {self.id}-{self.nickname} failed! {res.text}")
 
-    def get_list(self, time=None, t=None, offset=False) -> list:
+    def get_list(self, arg_time=None, arg_t=None, offset=False) -> list:
         list_url = 'https://www.zfrontier.com/v2/flow/list'
-        arg_time = str(int(time.time()))
+        data_time = str(int(time.time()))
         md5 = hashlib.md5((arg_time + self.headers['X-Csrf-Token']).encode("utf-8"))
-        arg_t = md5.hexdigest()
+        data_t = md5.hexdigest()
         data = {
-            'time': arg_time,
-            't': arg_t,
+            'time': data_time,
+            't': data_t,
             'offset': '',
             'cid': '1',
             'sortBy': 'new',
             'tagIds[0]': '2007'
         }
-        if time is not None or t is not None:
-            data['time'] = time
-            data['t'] = t
+        if arg_time is not None or arg_t is not None:
+            data['time'] = arg_time
+            data['t'] = arg_t
         if offset:
             data['offset'] = offset
         logging.info(data)
@@ -246,7 +246,7 @@ class User(object):
         logging.info(f"min_post_id:{min_post_id},min_last_re:{min_last_re}")
         if min_post_id > min_last_re:
             time.sleep(random.randint(3, 10))
-            offset_post_list = self.get_list(time=data['time'],t=data['t'],offset=offset)
+            offset_post_list = self.get_list(arg_time=data['time'],arg_t=data['t'],offset=offset)
             handled_post_list.extend(offset_post_list)
         logging.info(f"post_list:{handled_post_list}")
         return handled_post_list
