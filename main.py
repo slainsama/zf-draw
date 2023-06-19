@@ -80,6 +80,7 @@ if __name__ == '__main__':
             del_user_bytes()
         if db_load:
             load_from_database()
+        print(User.user_list)
         scheduler = APScheduler()
         app.config['SCHEDULER_API_ENABLED'] = True
         app.config['JOBS'] = [
