@@ -41,7 +41,10 @@ def add_user(mobile, password):
 
 def get_random_user():
     random_count = random.randint(0, len(User.user_list) - 1)
-    return User.user_list[random_count]
+    if User.user_list[random_count].status:
+        return User.user_list[random_count]
+    else:
+        return  get_random_user()
 
 
 def del_user_bytes():
