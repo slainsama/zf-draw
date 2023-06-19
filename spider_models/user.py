@@ -63,7 +63,7 @@ class User(object):
             'password': password
         }
         login_res = session.post(url=password_url, headers=self.headers, data=data)
-        if '"ok":0' in login_res.text and re.search(r'userId%22%3A(\d+)%2C%22hashId', new_cookies['userDisplayInfo']).group(1)!=None:
+        if '已登录' in login_res.text:
             logging.info(f"login {self.id}-{self.nickname} success!")
             cookie_dict = requests.utils.dict_from_cookiejar(login_res.cookies)
             new_cookies = requests.cookies.RequestsCookieJar()
