@@ -1,5 +1,6 @@
 import random
 
+import models.user_picked
 from spider_models.user import User
 import logging
 import pickle
@@ -41,7 +42,12 @@ def add_user(mobile, password):
 
 def get_random_user():
     random_count = random.randint(0, len(User.user_list) - 1)
-    return User.user_list[random_count]
+    random_user=User.user_list[random_count]
+    if models.user_picked.UserPicked.select().where(models.user_picked.UserPicked.id == random_user.id):
+        return random_user
+    else:
+        return get_random_user()
+
 
 
 def del_user_bytes():
