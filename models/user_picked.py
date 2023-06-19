@@ -6,9 +6,9 @@ class UserPicked(Model):
     id = IntegerField(unique=True)
     nickname = CharField()
     mobile = CharField()
-    password = CharField()
+    password = CharField(null=False)
     last_replied = IntegerField()
-    data = BlobField()
+    data = BlobField(null=False)
     status = BooleanField()
     got_prize=BooleanField()
 
