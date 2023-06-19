@@ -63,7 +63,7 @@ class User(object):
             'password': password
         }
         login_res = session.post(url=password_url, headers=self.headers, data=data)
-        if '"ok":0' in login_res.text:
+        if '"ok":0' in login_res.text and re.search(r'userId%22%3A(\d+)%2C%22hashId', new_cookies['userDisplayInfo']).group(1)!=None:
             logging.info(f"login {self.id}-{self.nickname} success!")
             cookie_dict = requests.utils.dict_from_cookiejar(login_res.cookies)
             new_cookies = requests.cookies.RequestsCookieJar()
@@ -84,7 +84,8 @@ class User(object):
                                   status=True)
             return True
         else:
-            logging.info(f"login {self.id}-{self.nickname} false!")
+            logging.info(f"login false!")
+            User.user_list.remove(self)
             return False
 
     def login(self):
@@ -122,7 +123,8 @@ class User(object):
             else:
                 UserPicked.create(id=self.id, nickname=self.nickname, status=True)
         else:
-            logging.info(f"login {self.id}-{self.nickname} false!")
+            logging.info(f"login false!")
+            User.user_list.remove(self)
 
     def get_csrf_token(self):
         try:
