@@ -133,7 +133,6 @@ class User(object):
             match = re.search(r"dow\.csrf_token = '(.+?)';", res.text)
             self.headers['X-Csrf-Token'] = match.group(1)
             logging.info(f"{self.id}-{self.nickname} got csrf-token")
-            print(self.nickname)
         except Exception as e:
             logging.error(e)
 
@@ -216,12 +215,10 @@ class User(object):
             'sortBy': 'new',
             'tagIds[0]': '2007'
         }
-        print(data)
         if offset:
             data['offset'] = offset
         logging.info(data)
         res = requests.post(url=list_url, data=data, headers=self.headers,cookies=self.cookie)
-        print(res.text)
         logging.info(res.text)
         logging.info(f"get list success")
         list_json = json.loads(res.text)
